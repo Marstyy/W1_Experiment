@@ -49,13 +49,15 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static uint32_t TimeDelay = 500;
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static uint32_t TimeDelay =500;
+
 /* USER CODE END 0 */
 
 /**
@@ -114,7 +116,7 @@ int main(void)
 		  {
 			  TimeDelay = 3000;
 		  }
-		  else
+		  else if(TimeDelay == 3000)
 		  {
 			  TimeDelay = 500;
 		  }
