@@ -98,85 +98,80 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  //Button
-//	  	static GPIO_PinState S1State[2] = {0};
-////	  	static uint32_t TimeDelay = 1000; //ms
-//		S1State[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10); // READ PIN B1 [PA10]
-//		if (S1State[1] == GPIO_PIN_SET && S1State[0] == GPIO_PIN_RESET) //falling edge
-//		{
-//			if(TimeDelay == 1000)
-//			{
-//			  TimeDelay = 500;
-//			}
-//			else if(TimeDelay == 500)
-//			{
-//			  TimeDelay = 250;
-//			}
-//			else if(TimeDelay == 250)
-//			{
-//			  TimeDelay = 1000/6;
-//			}
-//			else if(TimeDelay == 1000/6)
-//			{
-//			  TimeDelay = 1000;
-//			}
-//		}
-//		S1State[1] = S1State[0];
-//
-//
-//
-//
-//		//LED
-//		static uint32_t timeStamp = 0;
-//		if( HAL_GetTick() - timeStamp >= TimeDelay)
-//		{
-//		  timeStamp = HAL_GetTick();
-//		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
-//		}
-
-
-		//flashing light 2 Hz
-//		static GPIO_PinState S2State[2] = {0};
-//		static uint32_t TimeDelay = 250;
-//		S2State[0] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
-//		if(S2State[1] == GPIO_PIN_SET && S2State[0] == GPIO_PIN_RESET){
-//			if(TimeDelay == 250){
-//				TimeDelay = GPIO_PIN_SET;
-//			}
-//			else{
-//				TimeDelay = 250;
-//			}
-//		}
-//		S2State[1] = S2State[0];
-//
-//		//LED D3
-//		static uint32_t timeStamp = 0;
-//		if( HAL_GetTick() - timeStamp >= TimeDelay)
-//		{
-//		  timeStamp = HAL_GetTick();
-//		  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-//		}
-
-	  //flashing LED D5
-	  static GPIO_PinState S3State[2] = {0};
-	  static uint32_t TimeDelay = 500; //5 s
+	  static GPIO_PinState S1State[2],S2State[2],S3State[2] = {0};
+	  static uint32_t TimeD1[5] = {1000,500,250,1000/6}; //Hz
+	  static uint32_t TimeDelayD1 = 0;
+	  static uint8_t checkstate = 0;
+	  static uint8_t checkorder = 0;
+	  S1State[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);	//Read pin [PA10]
+	  S2State[0] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
 	  S3State[0] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
-	  if(S3State[1] == GPIO_PIN_SET && S3State[0] == GPIO_PIN_RESET){
-		  if(TimeDelay == 500){
-			  TimeDelay == 1500;
+//	  S4State[0] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);
+	  //1
+	  if(S1State[1] == GPIO_PIN_SET && S1State[0] == GPIO_PIN_RESET){
+		  if(checkorder > 4){
+			  checkorder = 0;
+		  }
+		  TimeDelayD1 = TimeD1[checkorder];
+		  checkorder += 1;
+		  checkstate = 0;
+	  }
+	  S1State[1] = S1State[0];
+
+	  //2
+	  static uint32_t TimeDelayD3 = 250;
+	  if(S2State[1] == GPIO_PIN_SET && S2State[0] == GPIO_PIN_RESET){
+		  if(TimeDelayD3 == 250){
+			  TimeDelayD3 = GPIO_PIN_SET;
 		  }
 		  else{
-			  TimeDelay == 500;
+			  TimeDelayD3 = 250;
 		  }
+		  checkstate = 1;
+	  }
+	  S2State[1] = S2State[0];
+
+	  //3
+	  static uint32_t TimeD5[2] = {500,1500};
+	  static uint32_t TimeDelayD5 = 500;
+	  if(S3State[1] == GPIO_PIN_SET && S3State[0] == GPIO_PIN_RESET){
+		  if(TimeDelayD5 == 500){
+			  TimeDelayD5 = 1500;
+
+		  }
+		  else{
+			  TimeDelayD5 = 500;
+		  }
+		  checkstate = 2;
 	  }
 	  S3State[1] = S3State[0];
 
-	  //LED D5
+	  //LED
 	  static uint32_t timeStamp = 0;
-	  if(HAL_GetTick() - timeStamp >= TimeDelay){
+	  static uint8_t check = 0;
+	  if(HAL_GetTick() - timeStamp >= TimeDelayD1 && checkstate == 0){
 		  timeStamp = HAL_GetTick();
-		  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
 	  }
+	  else if(HAL_GetTick() - timeStamp >= TimeDelayD3 && checkstate == 1){
+		  timeStamp = HAL_GetTick();
+		  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
+
+	  }
+	  else if(HAL_GetTick() - timeStamp >= TimeDelayD5 && checkstate == 2){
+		  timeStamp = HAL_GetTick();
+		  if(check == 0){
+			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+			check += 1;
+			TimeDelayD5 = TimeD5[check];
+		  }
+		  else if(check == 1){
+			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+			check = 0;
+			TimeDelayD5 = TimeD5[check];
+		  }
+	  }
+
 
     /* USER CODE BEGIN 3 */
   }
